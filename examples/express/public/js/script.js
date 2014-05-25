@@ -3,9 +3,12 @@ var api = "http://localhost:8081/";
 $(document).ready(function(){
 
   var map = L.map('map').setView([55.609842, 13.002763], 13);
+//  var map = L.map('map').setView([59.83, 15.69], 13);
+
+
 
   var searchLatLng;
-  var searchRadius = 1.5;
+  var searchRadius = .3;
 
   // add an OpenStreetMap tile layer
   var colorTile = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
@@ -42,6 +45,7 @@ $(document).ready(function(){
   map.on('click', function(e){
     searchLatLng = e.latlng;
     updateMap();
+    info.update();
   });
 
 
@@ -59,6 +63,22 @@ $(document).ready(function(){
 
 
 
+  var info = L.control();
+
+  info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this.update();
+    return this._div;
+  };
+
+  // method that we will use to update the control based on feature properties passed
+  info.update = function (props) {
+    if(searchLatLng)
+      this._div.innerHTML = "Center: "+searchLatLng.lat+", "+searchLatLng.lng;
+  };
+
+  info.addTo(map);
+
 
   var updateMap = function() {
     //Clear the layer groups
@@ -75,13 +95,12 @@ $(document).ready(function(){
     //Get nearby stations example
     //
 
-    /*
-    $.getJSON('api/StopsNearby/' + searchLatLng.lat + '/' + searchLatLng.lng + '/' + searchRadius, function (data) {
-      data.forEach(function (el) {
-        stationsLayer.addLayer(L.circleMarker([el.stop_lat, el.stop_lon], {color:'blue', radius:5}).bindPopup(el.stop_name));
-      });
-    });
-    */
+    /*     $.getJSON('api/StopsNearby/' + searchLatLng.lat + '/' + searchLatLng.lng + '/' + searchRadius, function (data) {
+     data.forEach(function (el) {
+     stationsLayer.addLayer(L.circleMarker([el.stop_lat, el.stop_lon], {color:'blue', radius:5}).bindPopup(el.stop_name));
+     });
+     });
+     */
 
 
     //
@@ -119,5 +138,42 @@ $(document).ready(function(){
         });
       });
     });
+
+
+    // Get trips example
+    /*$.getJSON(api+'api/tripsNearby/' + searchLatLng.lat + '/' + searchLatLng.lng + '/' + searchRadius, function (trips) {
+      trips.forEach(function(trip){
+
+        $.getJSON(api+'api/stopsOnTrip/'+trip.agency_key+'/' + trip.trip_id, function (stops) {
+          var color = 'rgb(0,0,255)';
+          var dash;
+
+          //Train
+          if(trip.route.route_type == 2)
+            color = 'rgb(220,0,0)';
+          //Bus
+          if(trip.route.route_type == 3) {
+            color = 'rgb(220,100,0)';
+            dash = "5, 10";
+          }
+          //Ferry
+          if(trip.route.route_type == 4)
+            color = 'rgb(100,100,255)';
+
+          var latlngs = [];
+          for(var u=0;u<stops.length;u++){
+            latlngs.push([stops[u].stop_lat, stops[u].stop_lon]);
+            L.circleMarker([stops[u].stop_lat, stops[u].stop_lon], {color:'blue', radius:5, opacity:0, fillOpacity:0.4})
+              .bindLabel(stops[u].stop_name)
+              .addTo(stationsLayer);
+          }
+          L.polyline(latlngs, {color: color, weight: 2, opacity:0.8, 'stroke-linecap':'round', 'stroke-linejoin':'round', dashArray: dash})
+            .bindLabel(trip.route.route_short_name + " "+ trip.route.route_long_name)
+            .addTo(routesLayer);
+        });
+      });
+    });*/
   };
+
+
 });
