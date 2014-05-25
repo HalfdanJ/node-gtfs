@@ -1,4 +1,4 @@
-var gtfs = require('../../');
+var gtfs = require('./../../lib/gtfs');
 
 module.exports = function routes(app){
   
@@ -42,11 +42,20 @@ module.exports = function routes(app){
       res.send( data || {error: 'No routes within radius of ' + radius + ' miles'});
     });
   });
+
   app.get('/api/routesNearby/:lat/:lon', function(req, res){
     var lat = req.params.lat
       , lon = req.params.lon;
     gtfs.getRoutesByDistance(lat, lon, function(e, data){
       res.send( data || {error: 'No routes within default radius'});
+    });
+  });
+
+  app.get('/api/routesByStop/:stop_id', function(req, res){
+    var stop_id = req.params.stop_id
+
+    gtfs.getRoutesByStop(stop_id, function(e, data){
+      res.send( data || {error: 'No routes with this stop_id'});
     });
   });
   
@@ -103,6 +112,15 @@ module.exports = function routes(app){
     });
   });
     
+  app.get('/api/times/:agency/:stop_id', function(req, res){
+    var agency_key = req.params.agency
+      , route_id = req.params.route_id
+
+    gtfs.getTimesByStop(agency_key, route_id, stop_id, function(e, data){
+      res.send( data || {error: 'No times for agency/route/stop combination.'});
+    });
+  });
+
   //Nothing specified
   app.all('*', function notFound(req, res) {
     
