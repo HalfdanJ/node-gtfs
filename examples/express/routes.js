@@ -82,6 +82,14 @@ module.exports = function routes(app){
       res.send( data || {error: 'No stops for agency/route combination.'});
     });
   });
+
+  app.get('/api/stopsOnTrip/:agency/:trip_id', function(req, res){
+    var agency_key = req.params.agency
+      , trip_id = req.params.trip_id;
+    gtfs.getStopsByTrip(agency_key, trip_id, function(e, data){
+      res.send( data || {error: 'No stops for agency/trip combination.'});
+    });
+  });
   
   app.get('/api/stopsNearby/:lat/:lon/:radiusInMiles', function(req, res){
     var lat = req.params.lat
@@ -95,6 +103,17 @@ module.exports = function routes(app){
     var lat = req.params.lat
       , lon = req.params.lon;
     gtfs.getStopsByDistance(lat, lon, function(e, data){
+      res.send( data || {error: 'No stops within default radius'});
+    });
+  });
+
+  //Trips
+  app.get('/api/tripsNearby/:lat/:lon/:radiusInMiles', function(req, res){
+    var lat = req.params.lat
+      , lon = req.params.lon
+      , radius = req.params.radiusInMiles;
+
+    gtfs.getTripsNearby(lat, lon, radius, function(e, data){
       res.send( data || {error: 'No stops within default radius'});
     });
   });
