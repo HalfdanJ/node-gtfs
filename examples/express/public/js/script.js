@@ -1,4 +1,4 @@
-
+var api = "http://localhost:8081/";
 
 $(document).ready(function(){
 
@@ -87,10 +87,10 @@ $(document).ready(function(){
     //
     //Get nearby routes example
     //
-    $.getJSON('api/routesNearby/' + searchLatLng.lat + '/' + searchLatLng.lng + '/' + searchRadius, function (data) {
+    $.getJSON(api+'api/routesNearby/' + searchLatLng.lat + '/' + searchLatLng.lng + '/' + searchRadius, function (data) {
       data.forEach(function(route){
 
-        $.getJSON('api/stops/'+route.agency_key+'/' + route.route_id, function (stops) {
+        $.getJSON(api+'api/stops/'+route.agency_key+'/' + route.route_id, function (stops) {
           var color = 'rgb(0,0,255)';
           var dash;
 

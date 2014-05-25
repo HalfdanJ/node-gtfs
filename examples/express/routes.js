@@ -1,7 +1,13 @@
 var gtfs = require('./../../lib/gtfs');
 
 module.exports = function routes(app){
-  
+  app.all('*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+  });
+
+
   //AgencyList
   app.get('/api/agencies', function(req, res){
     gtfs.agencies(function(e, data){
@@ -125,6 +131,7 @@ module.exports = function routes(app){
   app.all('*', function notFound(req, res) {
     
     res.contentType('application/json');
+
     res.send({
       error: 'No API call specified'
     });
